@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+
+# Gradio
+gradio_cached_examples/
+flagged/
+
+# OS
+.DS_Store
+Thumbs.db
