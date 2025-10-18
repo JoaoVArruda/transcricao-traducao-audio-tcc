@@ -8,7 +8,6 @@ TCC: USO DE TRANSCRIÇÃO DE ÁUDIO PARA TRADUÇÃO DINÂMICA DE IDIOMAS COM MOD
 """
 
 import gradio as gr
-from typing import Tuple
 import whisper
 from deep_translator import GoogleTranslator, MyMemoryTranslator
 from langdetect import detect
@@ -99,11 +98,11 @@ def traduzir_texto(texto: str, idioma_destino: str, idioma_origem: str = None):
 
 def processar_audio(
     arquivo_audio,
-    qualidade: str,
-    idioma_origem: str,
-    idioma_destino: str,
-    traduzir: bool
-) -> Tuple[str, str, str]:
+    qualidade,
+    idioma_origem,
+    idioma_destino,
+    traduzir
+):
     """Processa áudio completo: transcrição e tradução"""
     
     if arquivo_audio is None:
@@ -328,4 +327,4 @@ def criar_interface():
 if __name__ == "__main__":
     print("🚀 Iniciando Sistema de Transcrição e Tradução...")
     interface = criar_interface()
-    interface.launch(server_name="0.0.0.0", server_port=7860)
+    interface.launch()
