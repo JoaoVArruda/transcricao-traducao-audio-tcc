@@ -51,11 +51,16 @@ def processar(audio, qual, orig, dest, trad):
         return "❌ Nenhum arquivo enviado.", "", ""
     
     try:
+        print(f"🔄 Processando áudio: {audio}")
+        print(f"   Qualidade: {qual}")
+        print(f"   Origem: {orig}, Destino: {dest}, Traduzir: {trad}")
+        
         modelo = carregar_modelo(QUALIDADE[qual])
         cod_dest = IDIOMAS_DEST[dest]
         cod_orig = IDIOMAS.get(orig)
         
         # Transcreve
+        print(f"🎙️ Iniciando transcrição...")
         opts = {"fp16": False, "verbose": False}
         if cod_orig and cod_orig != "auto":
             opts["language"] = cod_orig
@@ -63,22 +68,28 @@ def processar(audio, qual, orig, dest, trad):
         resultado = modelo.transcribe(audio, **opts)
         texto = resultado["text"].strip()
         idioma = resultado.get("language", "desconhecido")
+        print(f"✅ Transcrição concluída: {len(texto)} caracteres")
         
         # Nome do idioma
         nome_idioma = next((k for k, v in IDIOMAS.items() if v == idioma), idioma)
         
         # Traduz
         if trad:
+            print(f"🌍 Iniciando tradução...")
             if idioma == cod_dest:
                 return texto, texto, f"🌐 Idioma: {nome_idioma}\n⚠️ Já está no idioma desejado"
             
             tradutor = GoogleTranslator(source=idioma, target=cod_dest)
             traduzido = tradutor.translate(texto)
+            print(f"✅ Tradução concluída")
             return texto, traduzido, f"🌐 Idioma detectado: {nome_idioma}\n📝 Google Translate"
         else:
             return texto, "✅ Tradução não solicitada", f"🌐 Idioma detectado: {nome_idioma}"
     
     except Exception as e:
+        print(f"❌ ERRO: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return f"❌ Erro: {str(e)}", "", ""
 
 # Interface
@@ -113,7 +124,12 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue")) as app:
                     trad1_out = gr.Textbox(label="🌍 Texto Traduzido", lines=8, show_copy_button=True)
                     info1 = gr.Textbox(label="ℹ️ Informações", lines=2)
             
-            btn1.click(processar, [arq, qual1, orig1, dest1, trad1], [trans1, trad1_out, info1])
+            btn1.click(
+                fn=processar, 
+                inputs=[arq, qual1, orig1, dest1, trad1], 
+                outputs=[trans1, trad1_out, info1],
+                api_name="processar_arquivo"
+            )
         
         with gr.Tab("🎤 Gravar Microfone"):
             gr.Markdown("### Grave sua voz diretamente")
@@ -135,7 +151,12 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue")) as app:
                     trad2_out = gr.Textbox(label="🌍 Texto Traduzido", lines=8, show_copy_button=True)
                     info2 = gr.Textbox(label="ℹ️ Informações", lines=2)
             
-            btn2.click(processar, [mic, qual2, orig2, dest2, trad2], [trans2, trad2_out, info2])
+            btn2.click(
+                fn=processar, 
+                inputs=[mic, qual2, orig2, dest2, trad2], 
+                outputs=[trans2, trad2_out, info2],
+                api_name="processar_microfone"
+            )
     
     gr.Markdown("---")
     gr.HTML("""
