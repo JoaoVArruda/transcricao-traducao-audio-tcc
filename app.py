@@ -328,4 +328,4 @@ def criar_interface():
 if __name__ == "__main__":
     print("🚀 Iniciando Sistema de Transcrição e Tradução...")
     interface = criar_interface()
-    interface.launch()
+    interface.launch(server_name="0.0.0.0", server_port=7860)
